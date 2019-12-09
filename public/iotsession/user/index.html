@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>IOT Panel</title>
+
+    <!-- FONT HERE -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
+    <!-- CSS HERE -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <!-- My Custom C
+        SS HERE -->
+    <link rel="stylesheet" href="../../styles/main.css">
+
+    <!-- Connect to my Project -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-database.js"></script>
+    <!-- Connect to my Project -->
+    <script src="../../scripts/fireconnect.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js"
+        integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og=="
+        crossorigin=""></script>
+</head>
+
+<body>
+    <p>User Panel</p>
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="../../imgs/icon-iot.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+            IoT Panel
+        </a>
+    </nav>
+    <div hidden>
+        <div id="mapMapBox" style="width: auto; height:600px;"></div>
+    </div>
+
+    <div>
+        <div id="mapOpenStreet" style="width: auto; height:400px;"></div>
+    </div>
+
+    <div>
+        <pre id="lastRun"></pre>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">id</th>
+                <th scope="col">Sensor</th>
+                <th scope="col">Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>lat</td>
+                <td id="lat"></td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>lon</td>
+                <td id="lon"></td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>speed</td>
+                <td id="speed"></td>
+            </tr>
+            <tr>
+                <th scope="row">4</th>
+                <td>status</td>
+                <td id="status"></td>
+            </tr>
+            <tr>
+                <th scope="row">5</th>
+                <td>Sensor</td>
+                <td>null</td>
+            </tr>
+            <tr>
+                <th scope="row">6</th>
+                <td>Sensor</td>
+                <td>null</td>
+            </tr>
+            <tr>
+                <th scope="row">7</th>
+                <td>Other Sensors</td>
+                <td>null</td>
+            </tr>
+        </tbody>
+    </table>
+    <button class="btn btn-md btn-danger" id="signout">SignOut</button>
+</body>
+<script>
+    function refreshThis() {
+        location.reload();
+    }
+    function handleSignOut() {
+        if (firebase.auth().currentUser) {
+            var user_signout = confirm("Sign Out ?")
+            if (user_signout == true) {
+                firebase.auth().signOut().then(function () {
+                }).catch(function (error) {
+                    alert(error.Message);
+                });
+            } else {
+                location.reload();
+            }
+
+        }
+    }
+
+    function initApp() {
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                if (firebase.auth().currentUser.uid == '1QGt1bVzikXLo1n3nDFZX45Qca42') {
+                    window.location.replace('../admin/');
+                }
+                else if (firebase.auth().currentUser.uid == 'viJT4hfIDzMxfPlTO6UuZf48k9p1') {
+                    //TODO USER
+                }
+                else {
+                    document.getElementById('warns').hidden = false;
+                    document.getElementById('load').hidden = false;
+                    setInterval(hundleSignOut, 7000)
+                }
+            }
+            else {
+                window.location.replace('../../');
+            }
+        });
+        document.getElementById('signout').addEventListener('click', handleSignOut, false);
+    }
+
+    window.onload = function () {
+        initApp();
+    };
+
+</script>
+<script src="culler.js"></script>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>IOT Panel</title>
+
+    <!-- FONT HERE -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+
+    <!-- CSS HERE -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    <!-- My Custom CSS HERE -->
+    <link rel="stylesheet" href="../styles/main.css">
+
+    <!-- Connect to my Project -->
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-database.js"></script>
+    <!-- Connect to my Project -->
+    <script src="../scripts/fireconnect.js"></script>
+</head>
+
+<body>
+    <!--<div class="container content loader text-center"></div>-->
+    <div class="d-flex justify-content-center" style="margin-top: 30%;">
+        <!--<div class="spinner-grow spinner-grow-sm" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>-->
+        <div class="spinner-grow text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        <!--<div class="spinner-grow spinner-grow-sm" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>-->
+    </div>
+    <br>
+    <div class="text-center" id="warns" hidden>
+        <h5 class="h5 text-danger">We think this is an <a class="text-warning">Unauthorized User.</a></h5>
+        <small>
+            <p class="text-secondary text-center">
+                if you believe this is an error,
+                please contact administrators.
+            </p>
+        </small>
+    </div>
+</body>
+
+<script type="application/javascript">
+    function hundleSignOut() {
+        if (firebase.auth().currentUser) {
+            firebase.auth().signOut()
+        }
+    }
+
+    function initApp() {
+        firebase.auth().onAuthStateChanged(function (user) {
+            if (user) {
+                if (firebase.auth().currentUser.uid == '1QGt1bVzikXLo1n3nDFZX45Qca42') {
+                    window.location.replace('./admin/');
+                }
+                else if (firebase.auth().currentUser.uid == 'viJT4hfIDzMxfPlTO6UuZf48k9p1') {
+                    window.location.replace('./user/');
+                }
+                else {
+                    document.getElementById('warns').hidden = false;
+                    setInterval(hundleSignOut, 7000)
+                }
+            }
+            else {
+                window.location.replace('../');
+            }
+        });
+    }
+
+    window.onload = function () {
+        initApp();
+    };
+</script>
+
+
+</html>
