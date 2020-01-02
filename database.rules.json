@@ -1,66 +1,70 @@
 {
- "rules": {
-   "public_resource": {
-      ".read": false,
-      ".write": false //locked
-    },
-    "restricted_access": {
-      ".read": "auth.uid === 'service-writer'",
-      ".write": "auth.uid === 'service-writer'"
-    },
-   "dope_share":{//10min access
-      ".read" : "auth.uid === 'doper-this' && data.child('timestamp').val() > (now - 600000)",
-      ".write" : "auth.uid === 'doper-this && $user_id % 2 === 0'",
-      ".validate": "newData.isString() && data.val().length < 20"
-      },
-    "iot_database" : {
-        ".read" : "auth.uid === 'guTNw8KvYNXdJVdhPfzBxf4uUMf2'",
-        ".write" : "auth.uid === 'guTNw8KvYNXdJVdhPfzBxf4uUMf2'"
-    },
-   "laxz-ssl-rpi" : {
-        ".read" : "auth.uid === 'laxz-admin'",
-        ".write" : "auth.uid === 'laxz-admin'"
-    },
-      "accounts" : {
-        ".read" : "auth.uid === 'laxz-admin'",
-        ".write" : "auth.uid === 'laxz-admin'"
-    },
-      "projects" : {
-        ".read" : "auth.uid === 'laxz-writer'",
-        ".write" : "auth.uid === 'laxz-writer'"
-    },
-    "project" : {
-      ".read" : true,
-      ".write" : true
-    },
-    "coordinates" : {
-      ".read" : "auth.uid != null",
-      ".write" : "auth.uid != null"
-    }
-  }
-}
-
-  
-  
-
-  
- //,
-    //"admin_resource": {
-    //  ".read": "auth.uid === 'laxz-shit-this'",
-    //  ".write": "auth.uid === 'laxz-shit-this'",
-    //  ".validate": "newData.val() === data.parent().child('sum').val() / data.parent().child('numItems').val()"
-    //}
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-    //
-  
-  /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
+  "rules": {
+    "public_resource": {
+       ".read": false,
+       ".write": false //locked
+     },
+     "restricted_access": {
+       ".read": "auth.uid === 'service-writer'",
+       ".write": "auth.uid === 'service-writer'"
+     },
+    "dope_share":{//10min access
+       ".read" : "auth.uid === 'doper-this' && data.child('timestamp').val() > (now - 600000)",
+       ".write" : "auth.uid === 'doper-this && $user_id % 2 === 0'",
+       ".validate": "newData.isString() && data.val().length < 20"
+       },
+     "iot_database" : {
+         ".read" : "auth.uid === 'guTNw8KvYNXdJVdhPfzBxf4uUMf2'",
+         ".write" : "auth.uid === 'guTNw8KvYNXdJVdhPfzBxf4uUMf2'"
+     },
+    "laxz-ssl-rpi" : {
+         ".read" : "auth.uid === 'laxz-admin'",
+         ".write" : "auth.uid === 'laxz-admin'"
+     },
+       "accounts" : {
+         ".read" : "auth.uid === 'laxz-admin'",
+         ".write" : "auth.uid === 'laxz-admin'"
+     },
+       "projects" : {
+         ".read" : "auth.uid === 'laxz-writer'",
+         ".write" : "auth.uid === 'laxz-writer'"
+     },
+     "project" : {
+       ".read" : true,
+       ".write" : true
+     },
+     "coordinates" : {
+       ".read" : "auth.uid != null",
+       ".write" : "auth.uid != null"
+     },
+       "tokens":{
+         ".read" : true,
+           ".write" : true
+       }
+   }
+ }
+ 
+   
+   
+ 
+   
+  //,
+     //"admin_resource": {
+     //  ".read": "auth.uid === 'laxz-shit-this'",
+     //  ".write": "auth.uid === 'laxz-shit-this'",
+     //  ".validate": "newData.val() === data.parent().child('sum').val() / data.parent().child('numItems').val()"
+     //}
+     //
+     //
+     //
+     //
+     //
+     //
+     //
+     //
+     //
+     //
+     //
+     //
+   
+   /* Visit https://firebase.google.com/docs/database/security to learn more about security rules. */
