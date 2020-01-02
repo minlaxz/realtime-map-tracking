@@ -130,33 +130,37 @@
 
         messaging.onTokenRefresh(() => {
             messaging.getToken().then((refreshedToken) => {
-                console.log('Token refreshed.');
+                log('Token refreshed.');
                 setTokenSentToServer(false);
                 saveTokenIdOfServer(false, '', '');
                 sendTokenToServer(refreshedToken);
                 resetUI();
             }).catch((err) => {
-                console.log('Unable to retrieve refreshed token ', err);
+                log('Unable to retrieve refreshed token ', err);
             });
         });
         messaging.onMessage((payload) => {
-            console.log('Message received. ', payload);
+            log('Message received. ', payload);
             //appendMessage(payload);
         });
 
         function sendTokenToServer(currentToken) {
             if (!isTokenSentToServer()) {
-                console.log('Sending token to server...');
-                p = pushToServer(currentToken)
+                log('Sending token to server...');
+                const time = new Date().getTime();
+                p = pushToServer(currentToken, time)
                 setTokenSentToServer(true);
-                saveTokenIdOfServer(true, currentToken, p.key);
+                saveTokenIdOfServer(true, currentToken, p.key, time);
             } else {
-                console.log('Token already sent to server so won\'t send it again ' +
+                log('Token already sent to server so won\'t send it again ' +
                     'unless it changes');
             }
         }
-        function pushToServer(currentToken) {
-            return dbRef.push({ token: currentToken });
+        function pushToServer(currentToken, time) {
+            return dbRef.push({ 
+                token: currentToken ,
+                time : time    
+                    });
         }
 
         function resetUI() {
@@ -169,15 +173,15 @@
                     sendTokenToServer(currentToken);
                     //showToken(currentToken);
                 } else {
-                    console.log('No Instance ID token available. Request permission to generate one.');
+                    log('No Instance ID token available. Request permission to generate one.');
                     setTokenSentToServer(false);
-                    saveTokenIdOfServer(false, '', '');
+                    saveTokenIdOfServer(false,'', '', '');
                 }
             }).catch((err) => {
-                console.log('An error occurred while retrieving token. ', err);
+                log('An error occurred while retrieving token. ', err);
                 //showToken('Error retrieving Instance ID token. ', err);
                 setTokenSentToServer(false);
-                saveTokenIdOfServer(false, '', '');
+                saveTokenIdOfServer(false, '', '', '');
             });
             // [END get_token]
         }
@@ -199,9 +203,10 @@
             return window.localStorage.getItem('token') === '';
         }
 
-        function saveTokenIdOfServer(save, token, id) {
+        function saveTokenIdOfServer(save, token, id, time) {
             window.localStorage.setItem('token', save ? token : '');
             window.localStorage.setItem('id', save ? id : '');
+            window.localStorage.setItem('time', save ? time : '');
         }
 
         function showHideDiv(divId, show) {
@@ -306,6 +311,10 @@
                     console.log('Unable to get permission to notify.');
                 }
             });
+        }
+
+        function log(arg){
+            console.log(arg);
         }
     </script>
 
