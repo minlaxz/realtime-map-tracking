@@ -1,12 +1,13 @@
 <!DOCTYPE html>
-<html>
+<html lang='en'>
 
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>IoT Panel(Login)</title>
-
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-iot.png">
     <!-- FONT HERE -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 
@@ -17,22 +18,23 @@
     <!-- My Custom CSS goes HERE -->
     <link rel="stylesheet" href="styles/main.css">
 
-    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/7.2.3/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.0/firebase-messaging.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.6.0/firebase-database.js"></script>
     <!-- Connect to my Project -->
-    <script src="scripts/fireconnect.js"></script>
+    <script src="scripts/connect.js"></script>
+
 
 </head>
 
 <body>
-
     <br>
 
     <form class="form-signin">
         <div class="text-center mb-4">
             <img class="mb-4" src="imgs/icon-iot.svg" alt="" width="72" height="72">
-            <h2 class="h3 mb-3 font-weight-bold shadow_laxz">CAR-MAPPING</h2>
+            <h2 class="h3 mb-3 font-weight-bold shadow_laxz">CAR-MAPPING...</h2>
             <h6 class="form-signin-heading head">IoT Control Panel by<a class="text-primary">
                     Project-6
                 </a></h6>
@@ -66,13 +68,17 @@
 
     <div class="container">
         <button class="btn btn-md btn-primary btn_login" id="signin">Login</button>
+        <button class="btn btn-md btn-success" onclick="sendNotification()" id='request'>Notify me</button>
         <div id="status"></div>
         <div id="details" class="separate"></div>
-
+        <p id="token" class="separate"></p>
+        <div id="messages"></div>
     </div>
+    <button onclick="deleteToken()" hidden>deleteToken</button>
+    <button onclick="DelCache()" hidden> Delete Cache</button>
 
     <div class="sticky-bottom text-center">
-        <img class="rounded mx-auto d-block" src="imgs/firebase-logo.png">
+        <img class="rounded mx-auto d-block" src="imgs/firebase-logo.png" alt="Firebase">
         <small><b>Developed by Project-6 (EC@TTU) <sup>5th</sup> and integrated with Firebase.</b></small>
         <hr>
         <small>
@@ -80,26 +86,35 @@
                 <div class="col">
                     <ul class="list-unstyled">
                         <li>
-                            <a href="https://mobile.facebook.com/minlaxz" target="_blank">Min Min Latt</a>
+                            <a href="https://mobile.facebook.com/minlaxz" target="_blank" rel="noopener"
+                                rel="noreferrer">Min Min Latt</a>
                         </li>
                         <li>
-                            <a href="https://mobile.facebook.com/96lunarsky" target="_blank">Kaung Htut Kyaw</a>
+                            <a href="https://mobile.facebook.com/96lunarsky" target="_blank" rel="noopener"
+                                rel="noreferrer">Kaung Htut Kyaw</a>
                         </li>
                         <li>
-                            <a href="https://mobile.facebook.com/morviz.march" target="_blank">Zwel Myat Aung</a>
+                            <a href="https://mobile.facebook.com/morviz.march" target="_blank" rel="noopener"
+                                rel="noreferrer">Zwel Myat Aung</a>
                         </li>
                     </ul>
                 </div>
                 <div class="col">
                     <ul class="list-unstyled">
                         <li>
-                            <a href="https://mobile.facebook.com/100008272719454" target="_blank">Hnin Pwint Phyu Aung</a>
+                            <a href="https://mobile.facebook.com/100008272719454" target="_blank" rel="noopener"
+                                rel="noreferrer">Hnin Pwint Phyu
+                                Aung</a>
                         </li>
                         <li>
-                            <a href="https://mobile.facebook.com/kyotagoonaing161216" target="_blank">Kyo Tagoo Naing</a>
+                            <a href="https://mobile.facebook.com/kyotagoonaing161216" target="_blank" rel="noopener"
+                                rel="noreferrer">Kyo Tagoo
+                                Naing</a>
                         </li>
                         <li>
-                            <a href="https://mobile.facebook.com/100007288277156" target="_blank">Aye Chan Pwint Phyu</a>
+                            <a href="https://mobile.facebook.com/100007288277156" target="_blank" rel="noopener"
+                                rel="noreferrer">Aye Chan Pwint
+                                Phyu</a>
                         </li>
                     </ul>
                 </div>
@@ -107,11 +122,194 @@
             </div>
         </small>
     </div>
-    
+
+    <script>
+        var dbRef = firebase.database().ref('tokens');
+        const messaging = firebase.messaging();
+        messaging.usePublicVapidKey('BM18DSO2fo2jIkL8O5dGBpSTAFI0nZubQInUSAAfV_zhaAh8lQt8Ou-bzqe2C5aK4a8xjxb_hFGTEtbLch3yHyc');
+
+        messaging.onTokenRefresh(() => {
+            messaging.getToken().then((refreshedToken) => {
+                console.log('Token refreshed.');
+                setTokenSentToServer(false);
+                saveTokenIdOfServer(false, '', '');
+                sendTokenToServer(refreshedToken);
+                resetUI();
+            }).catch((err) => {
+                console.log('Unable to retrieve refreshed token ', err);
+            });
+        });
+        messaging.onMessage((payload) => {
+            console.log('Message received. ', payload);
+            //appendMessage(payload);
+        });
+
+        function sendTokenToServer(currentToken) {
+            if (!isTokenSentToServer()) {
+                console.log('Sending token to server...');
+                p = pushToServer(currentToken)
+                setTokenSentToServer(true);
+                saveTokenIdOfServer(true, currentToken, p.key);
+            } else {
+                console.log('Token already sent to server so won\'t send it again ' +
+                    'unless it changes');
+            }
+        }
+        function pushToServer(currentToken) {
+            return dbRef.push({ token: currentToken });
+        }
+
+        function resetUI() {
+            //showToken('loading...');
+            // [START get_token]
+            // Get Instance ID token. Initially this makes a network call, once retrieved
+            // subsequent calls to getToken will return from cache.
+            messaging.getToken().then((currentToken) => {
+                if (currentToken) {
+                    sendTokenToServer(currentToken);
+                    //showToken(currentToken);
+                } else {
+                    console.log('No Instance ID token available. Request permission to generate one.');
+                    setTokenSentToServer(false);
+                    saveTokenIdOfServer(false, '', '');
+                }
+            }).catch((err) => {
+                console.log('An error occurred while retrieving token. ', err);
+                //showToken('Error retrieving Instance ID token. ', err);
+                setTokenSentToServer(false);
+                saveTokenIdOfServer(false, '', '');
+            });
+            // [END get_token]
+        }
+
+        function showToken(currentToken) {
+            const tokenElement = document.querySelector('#token');
+            tokenElement.textContent = currentToken;
+        }
+
+        function isTokenSentToServer() {
+            return window.localStorage.getItem('sentToServer') === '1';
+        }
+
+        function setTokenSentToServer(sent) {
+            window.localStorage.setItem('sentToServer', sent ? '1' : '0');
+        }
+
+        function isTokenIdSaved() {
+            return window.localStorage.getItem('token') === '';
+        }
+
+        function saveTokenIdOfServer(save, token, id) {
+            window.localStorage.setItem('token', save ? token : '');
+            window.localStorage.setItem('id', save ? id : '');
+        }
+
+        function showHideDiv(divId, show) {
+            const div = document.querySelector('#' + divId);
+            if (show) {
+                div.style = 'display: visible';
+            } else {
+                div.style = 'display: none';
+            }
+        }
+        function deleteF_IDs() {
+            const id = window.localStorage.getItem('id');
+            dbRef.child(id).remove()
+        }
+
+        function deleteToken() {
+            messaging.getToken().then((currentToken) => {
+                messaging.deleteToken(currentToken).then(() => {
+                    deleteF_IDs();
+                    console.log('Token deleted.');
+                    setTokenSentToServer(false);
+                    saveTokenIdOfServer(false, '', '');
+                    resetUI();
+                }).catch((err) => {
+                    console.log('Unable to delete token. ', err);
+                });
+            }).catch((err) => {
+                console.log('Error retrieving Instance ID token. ', err);
+                showToken('Error retrieving Instance ID token. ', err);
+            });
+        }
+
+        function DelCache() {
+            caches.open('laxz-pwa-cached').then((cache) => {
+                cache.delete('./index.html').then((response) => {
+                    //[TODO]
+                    console.log(response)
+                });
+            })
+        }
+
+        function delcaches() {
+            caches.delete('laxz-pwa-cached')
+        }
+
+        /*
+                // Add a message to the messages element.
+                function appendMessage(payload) {
+                    const messagesElement = document.querySelector('#messages');
+                    const dataHeaderELement = document.createElement('h5');
+                    const dataElement = document.createElement('pre');
+                    dataElement.style = 'overflow-x:hidden;';
+                    dataHeaderELement.textContent = 'Received message:';
+                    dataElement.textContent = JSON.stringify(payload, null, 2);
+                    messagesElement.appendChild(dataHeaderELement);
+                    messagesElement.appendChild(dataElement);
+                }
+                // Clear the messages element of all children.
+                function clearMessages() {
+                    const messagesElement = document.querySelector('#messages');
+                    while (messagesElement.hasChildNodes()) {
+                        messagesElement.removeChild(messagesElement.lastChild);
+                    }
+                }
+        */
+        if (Notification.permission === 'granted') {
+            const request = 'request'
+            showHideDiv(request, false)
+            console.log('Notification permission granted.');
+            // if ('serviceWorker' in navigator) {
+            //     navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            //         .then(function (registration) {
+            //             console.log('Service Worker Registered');
+            //         });
+
+            //     navigator.serviceWorker.ready.then(function (registration) {
+            //         console.log('Service Worker Ready');
+            //     });
+            // }
+            resetUI();
+        } else {
+            const signin = 'signin'
+            showHideDiv(signin, false)
+            const request = 'request'
+            showHideDiv(request, true)
+        }
+
+        function sendNotification() {
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    const request = 'request'
+                    showHideDiv(request, false)
+                    const signin = 'signin'
+                    showHideDiv(signin, true)
+                    console.log('Notification permission granted.');
+                    resetUI();
+                } else {
+                    const request = 'request'
+                    showHideDiv(request, true)
+                    const signin = 'signin'
+                    showHideDiv(signin, false)
+                    console.log('Unable to get permission to notify.');
+                }
+            });
+        }
+    </script>
+
 </body>
-
-
-
-<script src="scripts/main.js"></script>
+<script src="scripts/auth.js"></script>
 
 </html>
